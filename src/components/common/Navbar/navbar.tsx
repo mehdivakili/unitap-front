@@ -139,6 +139,31 @@ const RenderNavbarDropdown = () => {
   );
 };
 
+const RenderLogoutCard = ({ isOpen, handleOpen }: {isOpen: boolean, handleOpen: object}) => {
+  if (isOpen)
+    return (
+      <div className="absolute top-16 right-20 w-100 logout-card">
+        <div className="inner">
+          <div className="flex justify-between align-middle h-full p-3 pb-4 pt-4 gap-3">
+            <img src={ '/assets/images/navbar/profile.svg' } className=""/>
+            <div className="flex justify-between flex-col w-full">
+              <div className="flex justify-between w-full">
+                <p className="text-light-gray">@CNA</p>
+                <p className="text-gray100 text-sm">
+                  <Icon iconSrc="./assets/images/navbar/bright-icon-gray.svg"
+                        className="ml-2 mt-1 float-right h-4 w-4 "/>DISCONNECT
+                </p>
+              </div>
+              <p className="text-gray100 text-sm">Level: [Coming soon]</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  else return <></>
+
+}
+
 const RenderNavbarConnectionStatus = () => {
   const { account } = useWeb3React();
   const isWalletConnected = !!account;
@@ -147,10 +172,18 @@ const RenderNavbarConnectionStatus = () => {
   const isBrightIdConnected = !!userProfile;
 
   const EVMWallet = userProfile?.wallets.find((wallet) => wallet.walletType === "EVM");
-  
+
+  const [ isLogoutCardOpen, setLogoutCardOpen ] = useState(false)
+
+
   return (
-    <div className="navbar-connection-status flex rounded-lg h-8 items-center justify-between bg-gray40 pr-0.5 mr-3">
-      <Icon iconSrc="./assets/images/navbar/bright-icon.svg" width="16px" height="16px" className={`mx-3 ${!isBrightIdConnected && 'opacity-50'}`} />
+    <div className="navbar-connection-status flex rounded-lg h-8 items-center justify-between bg-gray40 pr-0.5 mr-3"
+    >
+      <Icon iconSrc="./assets/images/navbar/bright-icon.svg" width="16px" height="16px"
+            className={ `mx-3 cursor-pointer ${ !isBrightIdConnected && 'opacity-50' }` }
+            onClick={ () => setLogoutCardOpen(!isLogoutCardOpen) }/>
+
+      <RenderLogoutCard isOpen={ isLogoutCardOpen } handleOpen={ setLogoutCardOpen }></RenderLogoutCard>
 
       {!isBrightIdConnected ? (
         <RenderNavbarLoginBrightIdButton />
@@ -200,7 +233,7 @@ const RenderNavbarWalletAddress = ({ active }: { active: boolean }) => {
   const { userProfile } = useContext(UserProfileContext);
   const EVMWallet = userProfile?.wallets.find((wallet) => wallet.walletType === "EVM");
   const { account } = useWeb3React();
-  
+
   let address = account ? account : EVMWallet?.address;
 
   if (!address) return null;
